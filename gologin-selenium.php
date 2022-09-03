@@ -14,7 +14,7 @@ $dotenv->load();
 
 $gl = new GoLogin([
 	'token'      => $_ENV['TOKEN'],
-	'profile_id' => 'yU0Pr0f1leiD',
+	'profile_id' => '631344e888a97d127e972f71',
 	'port'       => GoLogin::getRandomPort()
 	//'tmpdir'     => __DIR__ . '/temp',
 ]);
