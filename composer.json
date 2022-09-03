@@ -1,0 +1,22 @@
+{
+  "name": "evilgazz/autotranslated",
+  "autoload": {
+    "psr-4": {
+      "App\\": "./"
+    }
+  },
+  "authors": [
+    {
+      "name": "olegopro",
+      "email": "evilgazz@gmail.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^7.4",
+    "php-webdriver/webdriver": "^1.12",
+    "cheprasov/php-parallel": "^1.2",
+    "ext-zip": "*",
+    "ext-sockets": "*",
+    "vlucas/phpdotenv": "^5.4"
+  }
+}
