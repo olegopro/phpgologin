@@ -11,7 +11,6 @@ use RecursiveIteratorIterator;
 use stdClass;
 use ZipArchive;
 
-require './vendor/autoload.php';
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
