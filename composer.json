@@ -1,4 +1,5 @@
 {
+  "license": "MIT",
   "name": "olegopro/phpgologin",
   "autoload": {
     "psr-4": {
