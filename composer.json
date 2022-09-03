@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "olegopro/phpgologin",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "prefer-stable" : true,
   "autoload": {
     "psr-4": {
