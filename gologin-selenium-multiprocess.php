@@ -9,8 +9,8 @@ use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Parallel\Parallel;
 use Parallel\Storage\ApcuStorage;
 
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+//$dotenv = Dotenv::createImmutable(__DIR__);
+//$dotenv->load();
 
 function scrap($profile)
 {

@@ -12,8 +12,8 @@ use stdClass;
 use ZipArchive;
 
 
-$dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+//$dotenv = Dotenv::createImmutable(__DIR__);
+//$dotenv->load();
 
 class GoLogin
 {
