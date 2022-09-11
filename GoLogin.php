@@ -11,10 +11,6 @@ use RecursiveIteratorIterator;
 use stdClass;
 use ZipArchive;
 
-
-//$dotenv = Dotenv::createImmutable(__DIR__);
-//$dotenv->load();
-
 class GoLogin
 {
 	private $access_token;
@@ -102,7 +98,6 @@ class GoLogin
 		}
 
 		$tz = $this->tz->timezone;
-
 
 		$params = [
 			$this->executablePath,
@@ -468,15 +463,15 @@ class GoLogin
 	private function getGeolocationParams($profileGeolocationParams, $tzGeolocationParams)
 	{
 		if ($profileGeolocationParams->fillBasedOnIp) {
-			return (object) [
+			return (object)[
 				'mode'      => $profileGeolocationParams->mode,
-				'latitude'  => (float) $tzGeolocationParams->latitude,
-				'longitude' => (float) $tzGeolocationParams->longitude,
-				'accuracy'  => (float) $tzGeolocationParams->accuracy,
+				'latitude'  => (float)$tzGeolocationParams->latitude,
+				'longitude' => (float)$tzGeolocationParams->longitude,
+				'accuracy'  => (float)$tzGeolocationParams->accuracy,
 			];
 		}
 
-		return (object) [
+		return (object)[
 			'mode'      => $profileGeolocationParams->mode,
 			'latitude'  => $profileGeolocationParams->latitude,
 			'longitude' => $profileGeolocationParams->longitude,
@@ -493,13 +488,12 @@ class GoLogin
 		$this->preferences = $preferences;
 
 		$this->tz = $this->getTimeZone();
-		$tzGeoLocation = (object) [
+		$tzGeoLocation = (object)[
 			'latitude'  => $this->tz->ll[0],
 			'longitude' => $this->tz->ll[1],
 			'accuracy'  => $this->tz->accuracy
 		];
 		$preferences->geoLocation = $this->getGeolocationParams($preferences->geolocation, $tzGeoLocation);
-
 
 		$preferences->{'webRtc'} = new stdClass();
 		$preferences->webRtc->mode = $preferences->webRTC->mode == 'alerted'
@@ -511,7 +505,6 @@ class GoLogin
 			: $preferences->webRTC->publicIp;
 
 		$preferences->webRtc->localIps = $preferences->webRTC->localIps;
-
 
 		$preferences->timezone->id = $this->tz->timezone;
 
@@ -526,8 +519,8 @@ class GoLogin
 		$preferences->audioContext->enable = $preferences->audioContextMode != 'off';
 		$preferences->audioContext->noiseValue = $preferences->audioContext->noise;
 
-		$preferences->webgl = (object) [
-			'metadata' => (object) [
+		$preferences->webgl = (object)[
+			'metadata' => (object)[
 				'vendor'   => $preferences->webGLMetadata->vendor,
 				'renderer' => $preferences->webGLMetadata->renderer,
 				'mode'     => $preferences->webGLMetadata->mode == 'mask'
@@ -563,7 +556,7 @@ class GoLogin
 				$deviceScaleFactor += 1e-08;
 			}
 
-			$preferences->mobile = (object) [
+			$preferences->mobile = (object)[
 				'enable'              => true,
 				'width'               => $preferences->screenWidth,
 				'height'              => $preferences->screenHeight,
@@ -594,8 +587,7 @@ class GoLogin
 
 			$port = $splittedProxyAddress[1];
 
-
-			$proxy = (object) [
+			$proxy = (object)[
 				'mode'     => 'http',
 				'host'     => $splittedProxyAddress[0],
 				'port'     => $port,
@@ -708,8 +700,8 @@ class GoLogin
 		$os_type = $options['os'] ?? 'lin';
 
 		$data = (new Client())->request('GET', $_ENV['API_URL'] . '/browser/fingerprint?os=' . $os_type, ['headers' => $this->headers()])
-		                      ->getBody()
-		                      ->getContents();
+							  ->getBody()
+							  ->getContents();
 
 		return json_decode($data);
 	}
@@ -726,8 +718,8 @@ class GoLogin
 	{
 		$profile_options = $this->getRandomFingerprint($options);
 
-		$options = (object) $options;
-		$navigator = (object) $options->navigator;
+		$options = (object)$options;
+		$navigator = (object)$options->navigator;
 
 		if ($options->navigator) {
 
@@ -735,12 +727,6 @@ class GoLogin
 			$userAgent = $navigator->userAgent;
 			$language = $navigator->language;
 
-			if (($resolution == 'random') || ($userAgent == 'random')) {
-				unset($options->navigator);
-			}
-			if (($resolution != 'random') && ($userAgent != 'random')) {
-				unset($options->navigator);
-			}
 			if (($resolution == 'random') && ($userAgent != 'random')) {
 				$profile_options->navigator->userAgent = $userAgent;
 			}
@@ -755,35 +741,28 @@ class GoLogin
 			$profile_options->navigator->language = $language;
 		}
 
+		$profile_options->webGLMetadata->mode = $profile_options->webGLMetadata->mode === 'noise' ? 'mask' : 'off';
+
 		$profile = [
 			'name'                  => 'default_name',
 			'notes'                 => 'auto generated',
 			'browserType'           => 'chrome',
 			'os'                    => 'mac',
 			'googleServicesEnabled' => true,
-			'lockEnabled'           => false,
-			'audioContext'          => ['mode' => 'noise'],
-			'canvas'                => ['mode' => 'noise'],
-
-			'webRTC' => [
-				'mode'          => 'disabled',
-				'enabled'       => false,
-				'customize'     => true,
-				'fillBasedOnIp' => true
-			],
-
-			'fonts'     => ['families' => $profile_options->fonts],
-			'navigator' => $profile_options->navigator,
-			'profile'   => json_encode($profile_options)
+			'navigator'             => $profile_options->navigator,
 		];
 
-		foreach ($options as $key => $value) {
-			$profile[$key] = $value;
-		}
+		$result = [...$profile, ...(array)$profile_options];
+
+		$result['fonts'] = ['families' => $profile_options->fonts];
+		$result['webRTC'] = [
+			...(array)$profile_options->webRTC,
+			'mode' => 'alerted'
+		];
 
 		$response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
 			'headers' => $this->headers(),
-			'json'    => $profile
+			'json'    => $result
 		])->getBody()->getContents();
 
 		return json_decode($response)->id;
@@ -801,7 +780,7 @@ class GoLogin
 	public function update($options)
 	{
 		$this->profile_id = $options['id'];
-		$profile = (array) $this->getProfile();
+		$profile = (array)$this->getProfile();
 
 		foreach ($options as $key => $value) {
 			$profile[$key] = $value;
@@ -832,7 +811,7 @@ class GoLogin
 			}
 
 			if ($try_number >= $try_count) {
-				return (object) ['status' => 'failure', 'wsUrl' => $wsUrl];
+				return (object)['status' => 'failure', 'wsUrl' => $wsUrl];
 			}
 			$try_number += 1;
 		}
@@ -840,7 +819,7 @@ class GoLogin
 		$wsUrl = str_replace(['ws://', '127.0.0.1'], ['wss://', $this->profile_id . '.orbita.gologin.com'], $wsUrl);
 		echo 'wsUrl: ' . $wsUrl . PHP_EOL;
 
-		return (object) ['status' => 'success', 'wsUrl' => $wsUrl];
+		return (object)['status' => 'success', 'wsUrl' => $wsUrl];
 	}
 
 	public function startRemote($delay_s = 3)
@@ -852,7 +831,7 @@ class GoLogin
 			return $this->waitDebuggingUrl($delay_s);
 		}
 
-		return (object) ['status' => 'failure'];
+		return (object)['status' => 'failure'];
 	}
 
 	public function stopRemote()

@@ -3,10 +3,10 @@
 use App\GoLogin;
 use Dotenv\Dotenv;
 
+require_once './vendor/autoload.php';
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-
 
 $gl = new GoLogin([
 	'token' => $_ENV['TOKEN']
@@ -17,15 +17,15 @@ $profile_id = $gl->create([
 		'name'         => 'profile_mac',
 		'os'           => 'mac',
 		'navigator'    => [
-			'language'   => 'en-US',
+			'language'   => 'ru-RU,en-US',
 			'userAgent'  => 'random',
 			'resolution' => 'random',
 			'platform'   => 'mac'
 		],
-		'proxyEnabled' => true,
+		'proxyEnabled' => false,
 		'proxy'        => [
-			'mode'            => 'gologin',
-			'autoProxyRegion' => 'us'
+			'mode' => 'none',
+			// 'autoProxyRegion' => 'us'
 			//'host'            => '',
 			//'port'            => '',
 			//'username'        => '',
