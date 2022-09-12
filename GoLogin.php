@@ -482,8 +482,8 @@ class GoLogin
 	private function convertPreferences($preferences)
 	{
 		$resolution = $preferences->navigator->resolution;
-		$preferences->screenWidth = explode("x", $resolution)[0];
-		$preferences->screenHeight = explode("x", $resolution)[1];
+		$preferences->screenWidth = (int)explode("x", $resolution)[0];
+		$preferences->screenHeight = (int)explode("x", $resolution)[1];
 
 		$this->preferences = $preferences;
 
