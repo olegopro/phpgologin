@@ -107,6 +107,7 @@ class GoLogin
 			'--tz=' . $tz,
 			'--gologin-profile=' . $this->profile_name,
 			'--lang=en-US',
+			'--start-maximized'
 		];
 
 		if ($proxy) {
@@ -484,6 +485,7 @@ class GoLogin
 		$resolution = $preferences->navigator->resolution;
 		$preferences->screenWidth = (int)explode("x", $resolution)[0];
 		$preferences->screenHeight = (int)explode("x", $resolution)[1];
+		$preferences->screenHeight = (float)$preferences->screenHeight - rand(40, 120);
 
 		$this->preferences = $preferences;
 
@@ -629,6 +631,11 @@ class GoLogin
 
 		$preferences->gologin = $gologin;
 
+		$language = $preferences->gologin->navigator->language;
+		$preferences->gologin->langHeader = $language;
+		$preferences->gologin->language = $language;
+		$preferences->gologin->languages = strtok($language, ';');
+
 		$pfile = fopen($pref_file, 'w');
 		fwrite($pfile, json_encode($preferences));
 		fclose($pfile);
@@ -752,13 +759,17 @@ class GoLogin
 			'navigator'             => $profile_options->navigator,
 		];
 
-		$result = [...$profile, ...(array)$profile_options];
+		$result = [...$profile, ...(array)$options, ...(array)$profile_options];
 
 		$result['fonts'] = ['families' => $profile_options->fonts];
 		$result['webRTC'] = [
 			...(array)$profile_options->webRTC,
 			'mode' => 'alerted'
 		];
+
+		$result['webGL'] = ['mode' => 'noise'];
+		$result['canvas'] = ['mode' => 'noise'];
+		$result['audioContext'] = ['mode' => 'noise'];
 
 		$response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
 			'headers' => $this->headers(),
