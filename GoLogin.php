@@ -49,7 +49,7 @@ class GoLogin
 		$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser/chrome']));
 
 		if (!is_dir($this->executablePath) && (strtolower(PHP_OS) == 'darwin')) {
-			$this->executablePath = realpath(join('/', [$home, '.gologin/browser/Orbita-Browser.app/Contents/MacOS/Orbita']));
+			$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser-105/Orbita-Browser.app/Contents/MacOS/Orbita']));
 		}
 
 		echo 'executablePath: ' . $this->executablePath . PHP_EOL;
@@ -286,14 +286,11 @@ class GoLogin
 			'Default/GPUCache',
 			'GrShaderCache',
 			'ShaderCache',
-			'biahpgbdmdkfgndcmfiipgcebobojjkp',
-			'afalakplffnnnlkncjhbmahjfjhmlkal',
-			'cffkpbalmllkdoenhmdmpbkajipdjfam',
 			'Dictionaries',
-			'enkheaiicpeffbfgjiklngbpkilnbkoi',
-			'oofiananboodjbbmdelgdommihjbkfag',
 			'SafetyTips',
-			'fonts'
+			'fonts',
+			'BrowserMetrics',
+			'BrowserMetrics-spare.pma',
 		];
 
 		foreach ($remove_dirs as $dir) {
@@ -495,6 +492,7 @@ class GoLogin
 			'longitude' => $this->tz->ll[1],
 			'accuracy'  => $this->tz->accuracy
 		];
+
 		$preferences->geoLocation = $this->getGeolocationParams($preferences->geolocation, $tzGeoLocation);
 
 		$preferences->{'webRtc'} = new stdClass();
@@ -513,13 +511,19 @@ class GoLogin
 		$preferences->webgl_noise_value = $preferences->webGL->noise;
 		$preferences->get_client_rects_noise = $preferences->webGL->getClientRectsNoise;
 
+
+		if	($preferences->clientRects->mode == 'noise'){
+			$preferences->client_rects_noise_enable = true;
+		}
+
 		$preferences->canvasMode = $preferences->canvas->mode;
 		$preferences->canvasNoise = $preferences->canvas->noise;
 
-		$preferences->audioContextMode = $preferences->audioContext->mode;
 
+		$preferences->audioContextMode = $preferences->audioContext->mode;
 		$preferences->audioContext->enable = $preferences->audioContextMode != 'off';
 		$preferences->audioContext->noiseValue = $preferences->audioContext->noise;
+
 
 		$preferences->webgl = (object)[
 			'metadata' => (object)[
@@ -597,7 +601,6 @@ class GoLogin
 				'password' => $profile->autoProxyPassword,
 				'timezone' => $profile->proxy->autoProxyRegion
 
-				//?
 				//'timezone' => $profile->autoProxyTimezone ?? 'us'
 			];
 
@@ -685,11 +688,15 @@ class GoLogin
 		}
 
 		$this->profile = $this->getProfile();
+
+
 		if (!$this->local) {
 			$this->downloadProfileZip();
 		}
 
 		$this->updatePreferences();
+
+
 
 		return $this->profile_path;
 	}
@@ -698,7 +705,7 @@ class GoLogin
 	{
 		return [
 			'Authorization' => 'Bearer ' . $this->access_token,
-			'User-Agent'    => 'Selenium-API'
+			'User-Agent'    => 'gologin-api'
 		];
 	}
 
@@ -769,7 +776,9 @@ class GoLogin
 
 		$result['webGL'] = ['mode' => 'noise'];
 		$result['canvas'] = ['mode' => 'noise'];
-		$result['audioContext'] = ['mode' => 'noise'];
+		$result['audioContextMode'] = ['mode' => 'noise'];
+		$result['clientRects'] = ['mode' => 'noise'];
+
 
 		$response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
 			'headers' => $this->headers(),

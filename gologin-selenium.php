@@ -7,7 +7,6 @@ use Facebook\WebDriver\Chrome\ChromeDriver;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 
-
 //$dotenv = Dotenv::createImmutable(__DIR__);
 //$dotenv->load();
 
@@ -21,7 +20,7 @@ $gl = new GoLogin([
 if (strtolower(PHP_OS) == 'linux') {
 	putenv("WEBDRIVER_CHROME_DRIVER=./chromedriver");
 } elseif (strtolower(PHP_OS) == 'darwin') {
-	putenv("WEBDRIVER_CHROME_DRIVER=./mac/chromedriver");
+	putenv("WEBDRIVER_CHROME_DRIVER=/Users/evilgazz/Downloads/chromedriver105");
 } elseif (strtolower(PHP_OS) == 'winnt') {
 	putenv("WEBDRIVER_CHROME_DRIVER=chromedriver.exe");
 }
