@@ -49,7 +49,7 @@ class GoLogin
 		$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser/chrome']));
 
 		if (!is_dir($this->executablePath) && (strtolower(PHP_OS) == 'darwin')) {
-			$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser-105/Orbita-Browser.app/Contents/MacOS/Orbita']));
+			$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser-109/Orbita-Browser.app/Contents/MacOS/Orbita']));
 		}
 
 		echo 'executablePath: ' . $this->executablePath . PHP_EOL;
