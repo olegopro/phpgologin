@@ -6,6 +6,7 @@ use Dotenv\Dotenv;
 use Exception;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use stdClass;
@@ -779,13 +780,17 @@ class GoLogin
 		$result['audioContextMode'] = ['mode' => 'noise'];
 		$result['clientRects'] = ['mode' => 'noise'];
 
+        try {
+            $response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
+                'headers' => $this->headers(),
+                'json'    => $result
+            ])->getBody()->getContents();
 
-		$response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
-			'headers' => $this->headers(),
-			'json'    => $result
-		])->getBody()->getContents();
+            return json_decode($response)->id;
 
-		return json_decode($response)->id;
+        } catch (ClientException $e){
+            echo $e->getResponse()->getBody()->getContents();
+        }
 	}
 
 	public function delete($profile_id = null)
