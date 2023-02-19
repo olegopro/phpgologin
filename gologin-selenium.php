@@ -16,7 +16,7 @@ $gl = new GoLogin([
 	'token'        => $_ENV['TOKEN'],
 	'profile_id'   => '63f13bffd1e803707766834a',
 	'port'         => GoLogin::getRandomPort(),
-	'extra_params' => ['--lang=ru-RU', '--start-maximized']
+	'extra_params' => ['--lang=ru', '--start-maximized']
 	//'tmpdir'     => __DIR__ . '/temp',
 ]);
 

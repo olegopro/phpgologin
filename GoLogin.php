@@ -214,10 +214,9 @@ class GoLogin
 	// Don't work for UNIX systems
 	private function waitUntilProfileUsing($try_count = 0)
 	{
-		if ($try_count > 10) {
-			return;
-		}
-		sleep(1);
+		popen('taskkill /F /IM chrome.exe /T', 'r');
+		sleep(5);
+
 		$profile_path = $this->profile_path;
 		echo 'profile_path: ' . $profile_path . PHP_EOL;
 		if (is_dir($profile_path)) {
@@ -233,6 +232,8 @@ class GoLogin
 	private function waitUntilProfileUsingUNIX($try_count = 0)
 	{
 		if ($try_count > 10) {
+			shell_exec('killall Orbita');
+
 			return;
 		}
 
@@ -247,7 +248,14 @@ class GoLogin
 
 	public function stop()
 	{
-		$this->waitUntilProfileUsingUNIX();
+		if (strtolower(PHP_OS) == 'darwin') {
+			$this->waitUntilProfileUsingUNIX();
+		}
+
+		if (strtolower(PHP_OS) == 'winnt') {
+			$this->waitUntilProfileUsing();
+		}
+
 		$this->sanitizeProfile();
 
 		if (!$this->local) {
