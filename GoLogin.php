@@ -47,7 +47,7 @@ class GoLogin
 
 		$home = $this->get_home_path();
 
-		$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser/chrome']));
+		$this->executablePath = realpath(join('\\', [$home, '.gologin\browser\orbita-browser-109']));
 
 		if (!is_dir($this->executablePath) && (strtolower(PHP_OS) == 'darwin')) {
 			$this->executablePath = realpath(join('/', [$home, '.gologin/browser/orbita-browser-109/Orbita-Browser.app/Contents/MacOS/Orbita']));
@@ -101,14 +101,12 @@ class GoLogin
 		$tz = $this->tz->timezone;
 
 		$params = [
-			$this->executablePath,
 			'--remote-debugging-port=' . $this->port,
 			'--user-data-dir=' . $this->profile_path,
 			'--password-store=basic',
 			'--tz=' . $tz,
 			'--gologin-profile=' . $this->profile_name,
 			'--lang=en-US',
-			'--start-maximized'
 		];
 
 		if ($proxy) {
@@ -121,12 +119,12 @@ class GoLogin
 			$params[] = $param;
 		}
 
-		$params[] = '>/dev/null 2>&1 &';
-
 		if (strtolower(PHP_OS) == 'darwin') {
-			shell_exec(implode(' ', $params));
-		} else {
-			echo 'Ошибка запуска браузера';
+			$params[] = '>/dev/null 2>&1 &';
+			shell_exec($this->executablePath . ' ' . implode(' ', $params));
+		} elseif (strtolower(PHP_OS) == 'winnt') {
+			// $params[] = '> NUL 2>&1';
+			popen('start ' . $this->executablePath . '\chrome.exe ' . implode(' ', $params), 'r');
 		}
 
 		$try_count = 1;
@@ -512,19 +510,16 @@ class GoLogin
 		$preferences->webgl_noise_value = $preferences->webGL->noise;
 		$preferences->get_client_rects_noise = $preferences->webGL->getClientRectsNoise;
 
-
-		if	($preferences->clientRects->mode == 'noise'){
+		if ($preferences->clientRects->mode == 'noise') {
 			$preferences->client_rects_noise_enable = true;
 		}
 
 		$preferences->canvasMode = $preferences->canvas->mode;
 		$preferences->canvasNoise = $preferences->canvas->noise;
 
-
 		$preferences->audioContextMode = $preferences->audioContext->mode;
 		$preferences->audioContext->enable = $preferences->audioContextMode != 'off';
 		$preferences->audioContext->noiseValue = $preferences->audioContext->noise;
-
 
 		$preferences->webgl = (object)[
 			'metadata' => (object)[
@@ -690,14 +685,11 @@ class GoLogin
 
 		$this->profile = $this->getProfile();
 
-
 		if (!$this->local) {
 			$this->downloadProfileZip();
 		}
 
 		$this->updatePreferences();
-
-
 
 		return $this->profile_path;
 	}
@@ -715,8 +707,8 @@ class GoLogin
 		$os_type = $options['os'] ?? 'lin';
 
 		$data = (new Client())->request('GET', $_ENV['API_URL'] . '/browser/fingerprint?os=' . $os_type, ['headers' => $this->headers()])
-							  ->getBody()
-							  ->getContents();
+		                      ->getBody()
+		                      ->getContents();
 
 		return json_decode($data);
 	}
@@ -780,17 +772,17 @@ class GoLogin
 		$result['audioContextMode'] = ['mode' => 'noise'];
 		$result['clientRects'] = ['mode' => 'noise'];
 
-        try {
-            $response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
-                'headers' => $this->headers(),
-                'json'    => $result
-            ])->getBody()->getContents();
+		try {
+			$response = (new Client())->request('POST', $_ENV['API_URL'] . '/browser', [
+				'headers' => $this->headers(),
+				'json'    => $result
+			])->getBody()->getContents();
 
-            return json_decode($response)->id;
+			return json_decode($response)->id;
 
-        } catch (ClientException $e){
-            echo $e->getResponse()->getBody()->getContents();
-        }
+		} catch (ClientException $e) {
+			echo $e->getResponse()->getBody()->getContents();
+		}
 	}
 
 	public function delete($profile_id = null)
